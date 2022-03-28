@@ -3,6 +3,7 @@ provider "azurerm" {
   features {
     
   }
+}
   terraform {
       backend "azurerm"{
           resource_group_name = "terraform-storage-rg"
@@ -11,4 +12,15 @@ provider "azurerm" {
           key = "lab01"
       }
   }
+
+
+locals {
+  name = "${var.name}${terraform.workspace}"
+  tags = merge(var.tags, {"env"=terraform.workspace,"app"=local.name})
+}
+
+resource "azurerm_resource_group" "rg" {
+  name = "${local.name}-rg"
+  location = var.region
+  tags = local.tags
 }
